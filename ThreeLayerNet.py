@@ -26,14 +26,13 @@ class NeuralNetwork:
         self.output = sigmoid(np.dot(self.layer2, self.weights3))
 
     def backprop(self):
-        # application of the chain rule to find derivative of the loss function with respect to weights2 and weights1
+        # application of the chain rule to find derivative of the loss function with respect to weights2 and weights1 and weights 3
         d_weights3 = np.dot(self.layer2.T, (2*(self.y - self.output) * sigmoid_derivative(self.output)))
         d_weights2 = np.dot(self.layer1.T, (np.dot(2*(self.y - self.output) * sigmoid_derivative(self.output), self.weights3.T) * sigmoid_derivative(self.layer2)))
- #      d_weights1 = np.dot(self.input.T, (np.dot(2*(self.y - self.output) * sigmoid_derivative(self.layer2), self.weights2.T) * sigmoid_derivative(self.layer1)))
- #       d_weights1 = np.dot(self.input.T, (np.dot((np.dot(2*(self.y - self.output) * sigmoid_derivative(self.output), self.weights3.T),self.weights2.T) * sigmoid_derivative(self.layer2))) * sigmoid_derivative(self.layer1))
-        # update the weights with the derivative (slope) of the loss function
         d_weights1 = np.dot(self.input.T, np.dot(np.dot(2*(self.y - self.output) * sigmoid_derivative(self.output),self.weights3.T) * sigmoid_derivative(self.layer2),self.weights2.T) * sigmoid_derivative(self.layer1))
-
+        
+        # update the weights with the derivative (slope) of the loss function. Added a .5 learning rate.
+        
         self.weights1 += 0.5 * d_weights1
         self.weights2 += 0.5 * d_weights2
         self.weights3 += 0.5 * d_weights3
@@ -61,11 +60,10 @@ if __name__ == "__main__":
         Losshistory.append(sum((nn.y - nn.output)**2)/len((nn.y - nn.output)**2))
         
     print(nn.output)
-    print((nn.y - nn.output)**2)
-    print(len(Losshistory))
     
- #   plt.plot(list(range(500)),Losshistory)
-#    plt.show()
+    # check the loss for the output
+    print((nn.y - nn.output)**2)
+    
 
 def predict(x_newinput):
     # This function returns the predicted output
@@ -76,6 +74,8 @@ def predict(x_newinput):
     return output
 
 print(predict([1,1,1,1,0]))
+
+# plots the loss decrease over training epochs
 
 plt.plot(list(range(1000)),Losshistory)
 plt.show()
